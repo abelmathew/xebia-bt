@@ -20,7 +20,7 @@ pipeline {
         stage('Publish') {
             steps {
                script {
-                  docker.withRegistry('', registryCredential ) {
+                  docker.withServer('tcp://ip-172-31-42-192.ec2.internal:2375').withRegistry('', registryCredential ) {
                     dockerImage.push()
                   }
                 }
