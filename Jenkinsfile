@@ -30,8 +30,8 @@ pipeline {
         }
         stage ('XL Deploy') {
             steps {
-                xldCreatePackage artifactsPath: './', darPath: '$JOB_NAME-$BUILD_NUMBER.0.dar', manifestPath: './deployit-manifest.xml'
-                xldPublishPackage serverCredentials: 'xld', darPath: '$JOB_NAME-$BUILD_NUMBER.0.dar'
+                xldCreatePackage artifactsPath: './', darPath: '$BUILD_NUMBER.dar', manifestPath: './deployit-manifest.xml'
+                xldPublishPackage serverCredentials: 'xld', darPath: '$BUILD_NUMBER.dar'
             }
         }
         
