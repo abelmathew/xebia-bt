@@ -1,10 +1,10 @@
 pipeline {
     agent any
     
-  environment {
-    registry = "vlussenburg/backtrace-webapp"
-    registryCredential = 'docker-login'
-  }
+    environment {
+        registry = "vlussenburg/backtrace-webapp"
+        registryCredential = 'docker-login'
+    }
 
     stages {
         stage('Build') {
@@ -26,6 +26,17 @@ pipeline {
                        }
                    }
                 }
+            }
+        }
+        stage ('XL Deploy') {
+            steps {
+                sh "./xlw apply -v --values=PACKAGE_NAME=Applications/BacktraceApp/$BUILD_NUMBER --values=IMAGE=vlussenburg/backtrace-app-web:$BUILD_NUMBER --values=APPLICATION_VERSION=$BUILD_NUMBER -f xebialabs.yaml"
+            }
+        }
+        
+        stage ('XL Release') {
+            steps {
+                xlrCreateRelease releaseTitle: 'Release for $BUILD_TAG', serverCredentials: 'xlr', startRelease: true, template: 'Samples & Tutorials/Sample Release Template with XL Deploy', variables: [[propertyName: 'packageId', propertyValue: 'Applications/InsecureBank/1.0.$BUILD_NUMBER'], [propertyName: 'application', propertyValue: 'InsecureBank'], [propertyName: 'packageVersion', propertyValue: '1.0.$BUILD_NUMBER'], [propertyName: 'ACC environment', propertyValue: 'Environments/dev'], [propertyName: 'QA environment', propertyValue: 'Environments/dev']]
             }
         }
     }

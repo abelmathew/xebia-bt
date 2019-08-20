@@ -1,0 +1,25 @@
+---
+apiVersion: xl-deploy/v1
+kind: Applications
+spec:
+  - name: BacktraceApp
+    type: udm.Application
+    children:
+      - name: !value PACKAGE_NAME
+        type: udm.DeploymentPackage
+        deployables:
+        - name: docker-backtrace-app-web
+          type: docker.ContainerSpec
+          containerName: backtrace-app
+          image: !value IMAGE
+          environment:
+            BACKTRACE_ENDPOINT: "{{BACKTRACE_ENDPOINT}}"
+            BACKTRACE_TOKEN: "{{BACKTRACE_TOKEN}}"
+            APPLICATION_VERSION: !value APPLICATION_VERSION
+            APPLICATION_NAME: "backtrace-app"
+          showLogsAfter: "5"
+          portBindings:
+          - name: pm-8080
+            type: docker.PortSpec
+            hostPort: "8080"
+            containerPort: "8080"
