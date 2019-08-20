@@ -30,7 +30,7 @@ pipeline {
         }
         stage ('XL Deploy') {
             steps {
-                sh "./xlw apply -v --values=PACKAGE_NAME=Applications/BacktraceApp/$BUILD_NUMBER --values=IMAGE=vlussenburg/backtrace-app-web:$BUILD_NUMBER --values=APPLICATION_VERSION=$BUILD_NUMBER -f xebialabs.yaml"
+                sh "./xlw apply -v --values=PACKAGE_NAME=Applications/BacktraceApp/$BUILD_NUMBER --values=IMAGE=vlussenburg/backtrace-webapp:$BUILD_NUMBER --values=APPLICATION_VERSION=$BUILD_NUMBER -f xebialabs.yaml"
             }
         }
         
