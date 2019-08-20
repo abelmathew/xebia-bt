@@ -1,14 +1,17 @@
 pipeline {
     agent any
+    
+  environment {
+    registry = "vlussenburg/backtrace-webapp"
+    registryCredential = 'docker-login'
+  }
 
     stages {
         stage('Build') {
             steps {
                 echo 'Building..'
                 script {
-                    if (Integer.valueOf(env.BUILD_ID) % 3 != 0) {
-                        error("Build failed.")
-                    }
+                    docker.build registry + ":$BUILD_NUMBER"
                 }
             }
         }
