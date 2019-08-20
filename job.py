@@ -14,16 +14,23 @@ sys.path.insert(0, root_dir)
 import backtracepython as bt
 
 from flask import Flask
-app = Flask(__name__)
+
+def createApp():
+    app = Flask(__name__)
+    def run_on_start(*args, **argv):
+        bt.initialize(
+                endpoint="https://submit.backtrace.io/testing-xebialabs/e958cfd2940e7bdb2d60fdf7fd22d4caaecdb9966efc835e24054a247aef6162/json",
+                token="e958cfd2941e7bdb2d60fdf7fd22d4caaecdb9966efc835e24054a247aef6162",
+                context_line_count=3
+        )
+        print "bt_initialized"
+    run_on_start()
+    return app
+app = createApp()
 
 # initializing Backtrace after Flask for ease of use
 @app.route('/init')
 def init():
-    bt.initialize(
-            endpoint="https://submit.backtrace.io/testing-xebialabs/e958cfd2940e7bdb2d60fdf7fd22d4caaecdb9966efc835e24054a247aef6162/json",
-            token="e958cfd2941e7bdb2d60fdf7fd22d4caaecdb9966efc835e24054a247aef6162",
-            context_line_count=3
-            )
     return "initialized"
 
 # Flask overrides global exception handler. errorhandler allows us to rewrite it
@@ -53,8 +60,5 @@ def crashHandler():
     crash()
     return "Hello World!"
 
-def main():
-    app.run()
-
 if __name__== '__main__':
-    main()
+    app.run()
