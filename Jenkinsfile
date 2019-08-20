@@ -28,5 +28,17 @@ pipeline {
                 }
             }
         }
+        stage ('XL Deploy') {
+            steps {
+                xldCreatePackage artifactsPath: './', darPath: '$JOB_NAME-$BUILD_NUMBER.0.dar', manifestPath: './deployit-manifest.xml'
+                xldPublishPackage serverCredentials: 'xld', darPath: '$JOB_NAME-$BUILD_NUMBER.0.dar'
+            }
+        }
+        
+        stage ('XL Release') {
+            steps {
+                xlrCreateRelease releaseTitle: 'Release for $BUILD_TAG', serverCredentials: 'xlr', startRelease: true, template: 'Samples & Tutorials/Sample Release Template with XL Deploy', variables: [[propertyName: 'packageId', propertyValue: 'Applications/BacktraceApp/$BUILD_NUMBER'], [propertyName: 'application', propertyValue: 'BacktraceApp'], [propertyName: 'packageVersion', propertyValue: '$BUILD_NUMBER'], [propertyName: 'ACC environment', propertyValue: 'Environments/dev'], [propertyName: 'QA environment', propertyValue: 'Environments/dev']]
+            }
+        }
     }
 }
