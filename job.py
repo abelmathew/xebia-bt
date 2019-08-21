@@ -1,12 +1,8 @@
 #!/usr/bin/env python
 
-##
-# TODO: 
-# 
-## 
-
 import sys, os
 import random
+import json
 
 #insert file into path for code capture
 root_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
@@ -15,12 +11,22 @@ import backtracepython as bt
 
 from flask import Flask
 
+
+envVarsList = ["APPLICATION_VERSION", "APPLICATION_NAME"]
+globalAttributes = {}
+def populateGlobalAttributes():
+    for i in envVarsList:
+        if i in os.environ:
+            globalAttributes[i] = os.environ[i]
+
 def createApp():
     app = Flask(__name__)
     def run_on_start(*args, **argv):
+        populateGlobalAttributes()
         bt.initialize(
                 endpoint="https://submit.backtrace.io/testing-xebialabs/e958cfd2940e7bdb2d60fdf7fd22d4caaecdb9966efc835e24054a247aef6162/json",
                 token="e958cfd2941e7bdb2d60fdf7fd22d4caaecdb9966efc835e24054a247aef6162",
+                attributes=globalAttributes,
                 context_line_count=3
         )
         print "bt_initialized"
@@ -39,7 +45,7 @@ def handle_error(e):
     report = bt.BacktraceReport()
     report.capture_last_exception()
     report.send()
-    return "Error Encountered."
+    return json.dumps(globalAttributes)
 
 @app.route('/')
 def index():
