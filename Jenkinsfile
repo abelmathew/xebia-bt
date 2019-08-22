@@ -7,16 +7,6 @@ pipeline {
     }
 
     stages {
-        stage('Build') {
-            steps {
-                echo 'Building..'
-                script {
-                    if (Integer.valueOf(env.BUILD_ID) % 3 != 0) {
-                        error("Build failed.")
-                    }
-                }
-            }
-        }
         stage('Create docker image..') {
             steps {
                 echo 'Building..'
