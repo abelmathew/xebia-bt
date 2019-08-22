@@ -4,6 +4,10 @@ import io
 import sys
 import time
 
+def dummyFailure():
+    #failure to open
+    raise IOError("Connection to DB failed: BacktraceDatabase cannot be resolved")
+    return
 
 def write(payload):
     obj = {}
@@ -11,6 +15,7 @@ def write(payload):
     for key in payload.keys():
         obj[key] = payload[key]
 
-    #failure to open
-    raise IOError("Connection to DB failed: BacktraceDatabase cannot be resolved")
+    dummyFailure()
+
+    return
     

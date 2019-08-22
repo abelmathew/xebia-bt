@@ -2,8 +2,8 @@
 
 from . import userStore as userStore
 passwords = {
-    "amathew": "salted",
-    "vlussenberg": "salted2"
+    "amathew": "****",
+    "vlussenberg": "****"
 }
 
 def trackingLog(username, appversion):
@@ -21,6 +21,9 @@ def checkPassword(username, saltpw):
 
 LOG_LEVEL=-1
 LOG_INFO=1
+LOG_WARNING=2
+LOG_ERROR=3
+LOG_CRITICAL=4
 def log(level, string):
     if level == LOG_LEVEL:
         print string
