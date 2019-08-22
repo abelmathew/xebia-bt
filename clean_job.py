@@ -24,8 +24,8 @@ def createApp():
     def run_on_start(*args, **argv):
         populateGlobalAttributes()
         bt.initialize(
-                endpoint="https://submit.backtrace.io/testing-xebialabs/e958cfd2940e7bdb2d60fdf7fd22d4caaecdb9966efc835e24054a247aef6162/json",
-                token="e958cfd2941e7bdb2d60fdf7fd22d4caaecdb9966efc835e24054a247aef6162",
+                endpoint=os.environ['BACKTRACE_ENDPOINT'],
+                token=os.environ['BACKTRACE_TOKEN'],
                 attributes=globalAttributes,
                 context_line_count=3
         )
