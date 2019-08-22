@@ -20,6 +20,12 @@ def populateGlobalAttributes():
         if i in os.environ:
             globalAttributes[i] = os.environ[i]
 
+runtimeAttributes = {}
+def appendDictasBacktraceAttributes(fields):
+    fields.pop('password', None)
+    runtimeAttributes.update(fields)
+    return
+
 def createApp():
     app = Flask(__name__)
     def run_on_start(*args, **argv):
@@ -32,6 +38,7 @@ def createApp():
         )
     run_on_start()
     return app
+
 app = createApp()
 
 ##
@@ -42,44 +49,54 @@ app = createApp()
 def handle_error(e):
     report = bt.BacktraceReport()
     report.capture_last_exception()
+    report.set_dict_attributes(runtimeAttributes)
     report.send()
     return json.dumps(globalAttributes)
 
-def authenticateUser(username, saltpw, appversion = None):
-    authenticated = al.checkPassword(username, saltpw)
+def authenticateUser(username, saltpw):
+    return al.checkPassword(username, saltpw)
 
-    if appversion is not None:
-        al.trackingLog(username, appversion)
+def gatherFields(obj):
+    fields = {}
+    try:
+        fields['username'] = obj['username']
+        fields['password'] = obj['password']
+        fields['client'] = obj['client']
+    except Exception as e:
+        appendDictasBacktraceAttributes(fields)
+        al.log("Error parsing request. {}".format(obj))
+        raise e
+        return None
 
-    return authenticated
+    return gatherFields
 
-@app.route('/login', methods=['POST'])
+@app.route('/login', methods=['GET', 'POST'])
 def loginHandler():
     token = -1
     errorResponse = ("-1", 400)
 
+    if request.method == "GET":
+        f = open("index.html", "r")
+        return f.read()
+
     try: 
-        payload = request.json
+        payload = json.loads(request.data)
     except Exception as e:
         al.sendErrror(e)
         return errorResponse
     
-    ##
-    # Scenario 0: Normal Login, no app_version
-    # Scenario 1: not checking for the existence of app_version
-    # Scenario 2: having a subsystem not found, but don't care because that will come in a later check-in
-    ##
-    if authenticateUser(payload['username'], payload['password']) is False:
+    fields = gatherFields(payload)
+    if fields is None:
         return errorResponse
+
+    if authenticateUser(fields['username'], fields['password']) is False:
+        return errorResponse
+
+    al.trackingLog(fields['username'], fields['client'])
 
     token = al.generateSession(payload['username'])
     al.log(al.LOG_INFO, "username {} authenticated. {}".format(payload['username'], token))
     return token, 200
     
-@app.route('/')
-def indexHandler():
-    f = open("index.html", "r")
-    return f.read()
-
 if __name__== '__main__':
     app.run(host='0.0.0.0', port=80)

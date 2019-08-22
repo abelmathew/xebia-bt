@@ -49,13 +49,17 @@ def handle_error(e):
 def authenticateUser(username, saltpw):
     return al.checkPassword(username, saltpw)
 
-@app.route('/login', methods=['POST'])
+@app.route('/login', methods=['GET','POST'])
 def loginHandler():
     token = -1
-    errorResponse = ("-1", 400)
+    errorResponse = ("{ \"msg\": \"Auth Failure\" }", 400)
+    
+    if request.method == "GET":
+        f = open("index.html", "r")
+        return f.read()
 
     try: 
-        payload = request.json
+        payload = json.loads(request.data)
     except Exception as e:
         al.sendErrror(e)
         return errorResponse
@@ -72,11 +76,5 @@ def loginHandler():
     al.log(al.LOG_INFO, "username {} authenticated. {}".format(payload['username'], token))
     return token, 200
     
-@app.route('/')
-def indexHandler():
-    # server up website, which references JS from a CDN (or from somewhere)
-    website = "<html><head><title>Xebia Labs Webinar</title></head><body> Something cool </body></html>"
-    return website
-
 if __name__== '__main__':
     app.run()

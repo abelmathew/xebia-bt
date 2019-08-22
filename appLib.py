@@ -11,7 +11,7 @@ def trackingLog(username, appversion):
     return
 
 def generateSession(username):
-    return { "token": "lildjf1093l23923" }
+    return { "sessionID": "lildjf1093l23923" }
 
 def checkPassword(username, saltpw):
     if username in passwords:
