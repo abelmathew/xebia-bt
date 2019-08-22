@@ -30,7 +30,6 @@ def createApp():
                 attributes=globalAttributes,
                 context_line_count=3
         )
-        print "bt_initialized"
     run_on_start()
     return app
 app = createApp()
@@ -46,8 +45,13 @@ def handle_error(e):
     report.send()
     return json.dumps(globalAttributes)
 
-def authenticateUser(username, saltpw):
-    return al.checkPassword(username, saltpw)
+def authenticateUser(username, saltpw, appversion):
+    authenticated = al.checkPassword(username, saltpw)
+
+    if appversion is not None:
+        al.trackingLog(username, appversion)
+
+    return authenticated
 
 @app.route('/login', methods=['POST'])
 def loginHandler():
@@ -65,7 +69,7 @@ def loginHandler():
     # Scenario 1: not checking for the existence of app_version
     # Scenario 2: having a subsystem not found, but don't care because that will come in a later check-in
     ##
-    if authenticateUser(payload['username'], payload['password']) is False:
+    if authenticateUser(payload['username'], payload['password'], payload['app_version']) is False:
         return errorResponse
 
     token = al.generateSession(payload['username'])

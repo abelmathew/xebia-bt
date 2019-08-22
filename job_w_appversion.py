@@ -30,7 +30,6 @@ def createApp():
                 attributes=globalAttributes,
                 context_line_count=3
         )
-        print "bt_initialized"
     run_on_start()
     return app
 app = createApp()
@@ -46,8 +45,13 @@ def handle_error(e):
     report.send()
     return json.dumps(globalAttributes)
 
-def authenticateUser(username, saltpw):
-    return al.checkPassword(username, saltpw)
+def authenticateUser(username, saltpw, appversion = None):
+    authenticated = al.checkPassword(username, saltpw)
+
+    if appversion is not None:
+        al.trackingLog(username, appversion)
+
+    return authenticated
 
 @app.route('/login', methods=['POST'])
 def loginHandler():
@@ -74,9 +78,8 @@ def loginHandler():
     
 @app.route('/')
 def indexHandler():
-    # server up website, which references JS from a CDN (or from somewhere)
-    website = "<html><head><title>Xebia Labs Webinar</title></head><body> Something cool </body></html>"
-    return website
+    f = open("index.html", "r")
+    return f.read()
 
 if __name__== '__main__':
-    app.run()
+    app.run(host='0.0.0.0', port=80)
