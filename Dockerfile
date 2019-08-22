@@ -12,8 +12,8 @@ RUN mkdir /app
 ENV FLASK_APP=/app/job.py
 ENV FLASK_ENV=development
 
-COPY static/ /app/
-COPY libs/ /app/
+COPY static/* /app/static/
+COPY libs/* /app/libs/
 COPY *.py /app/
 
 EXPOSE 5000
