@@ -67,7 +67,10 @@ def gatherFields(obj):
     try:
         fields['username'] = obj['username']
         fields['saltpw'] = obj['password']
-        fields['client'] = obj['client']
+        if 'client' not in fields: 
+            fields['client'] = obj['Client']
+        else:
+            fields['client'] = obj['client']
     except Exception as e:
         appendDictasBacktraceAttributes(obj)
         al.log(al.LOG_ERROR,"Error parsing request. {}".format(obj))
