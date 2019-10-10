@@ -11,13 +11,13 @@ pipeline {
             steps {
                 echo 'Building..'
                 script {
-                    docker.withServer('tcp://ip-172-31-42-192.ec2.internal:2375') {
+                    docker.withServer('tcp://socat:2375') {
                         dockerImage = docker.build registry + ":$BUILD_NUMBER"
                     }
                 }
             }
         }
-        stage('Publish docker image..') {
+        /*stage('Publish docker image..') {
             steps {
                script {
                    docker.withServer('tcp://ip-172-31-42-192.ec2.internal:2375') {
@@ -27,7 +27,7 @@ pipeline {
                    }
                 }
             }
-        }
+        }*/
         stage ('Register deployment metadata') {
             steps {
                 sh "./xlw apply -v --values=PACKAGE_NAME=Applications/BacktraceApp/$BUILD_NUMBER --values=IMAGE=vlussenburg/backtrace-webapp:$BUILD_NUMBER --values=APPLICATION_VERSION=$BUILD_NUMBER -f xebialabs.yaml"
