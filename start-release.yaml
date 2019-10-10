@@ -1,0 +1,7 @@
+apiVersion: xl-release/v1
+kind: Release
+spec:
+  name: Ecommerce started from Jenkins
+  template: Ecommerce/EcommerceAppReleaseProcess
+#  variables:
+#    version: !value BUILD_NUMBER
